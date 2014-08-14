@@ -38,21 +38,24 @@
             getCount: function () {
                 return count;
             },
-            fileCount: function (path, floor) {
+            fileCount: function fileCount(path, floor) {
                 handFile(path, floor); //判断文件类型（文件夹/文件/js文件，做相应处理）
                 floor++;
                 var files = fs.readdirSync(path);
                 files.forEach(function(item){
-                    var nextPath = path + '/' + item;
-                    var stats = fs.statSync(nextPath);
-                    count['file_count'] += 1;
-                    
-                    if (stats.isDirectory()) {
-                        //递归处理目录文件
-                        fileCount(nextPath, floor);
-                    } else {
-                        //处理非目录文件
-                        handFile(nextPath, item);
+                    //去除目录.和..
+                    if (!item.match(/^\.$/g) && !item.match(/^\.\.$/g) ) {
+                        var nextPath = path + '/' + item;
+                        var stats = fs.statSync(nextPath);
+                        count['file_count'] += 1;
+                        
+                        if (stats.isDirectory()) {
+                            //递归处理目录文件
+                            fileCount(nextPath, floor);
+                        } else {
+                            //处理非目录文件
+                            handFile(nextPath, item);
+                        }
                     }
                 });            
             } 
